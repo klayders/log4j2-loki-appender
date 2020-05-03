@@ -1,0 +1,48 @@
+Configuration:
+  status: debug
+
+  appenders:
+    Console:
+      name: CONSOLE
+      PatternLayout:
+        pattern: '%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} %highlight{${LOG_LEVEL_PATTERN:-%5p}}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} %style{${sys:PID}}{magenta} [%10.15t] %style{%c{10}}{cyan} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}'
+
+#    Sentry:
+#      name: SENTRY
+#      ThresholdFilter:
+#        level: ERROR
+
+    RollingFile:
+      name: FILE
+      fileName: /log
+      filePattern: log.%d{yyyy-MM-dd}
+      LokiJsonLayout:
+        includeLocationInfo: true
+        KeyValuePair:
+          - key: appName
+            value: gosloto-site
+      DefaultRolloverStrategy:
+        #     максимальное количество создаваемых файлов
+        max: 7
+      Policies:
+        #          как часто создается новый файл, в зависимости от указанного filePattern
+        TimeBasedTriggeringPolicy:
+          interval: 1
+
+  Loggers:
+    Logger:
+      -
+        name: org
+        level: error
+        includeLocation: true
+        additivity: false
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: FILE
+      -
+    Root:
+      level: debug
+      AppenderRef:
+        - ref: CONSOLE
+        - ref: FILE
+#        - ref: SENTRY
